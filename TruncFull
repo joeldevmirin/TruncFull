@@ -1,0 +1,813 @@
+#!/bin/bash
+
+# Programa de conversão de mídia ou arquivo em plan text
+# Este programa pode ser utilizado para transmissão de arquivos com um pouco mais de privacidade
+# No caso de uma imagem, por exemplo: você pode converte-la em plan text e quebrar em N pedaços o texto...
+## depois pode executar criptografias sobre cada bloco de texto e transmitir para qualquer pessoa por meio
+## de um app de comunicação; o receptor estando em posse das chaves, pode descriptografar os blocos e remontar o texto
+## e assim conseguir fazer a função inversa e reconstruir a imagem.
+
+# Este programa também pode ser usado para transmitir mídias em meios de comunicação que só aceitam texto
+## como o IRC; 
+
+# É importante salientar que para a função inversa tenha sucesso, os blocos de textos
+## devem ser remontados na ordem correta, caso contrário, a saída final será um aruivo comrrompido.
+
+# Agora listarei algumas etiquetas que coloquei no script para poder ficar fácil a leitura:
+# Toda a etiqueta começará com "#E:":
+### "def_Nx" >>> são etiquetas de funções
+### "blk_Nx" >>> são etiquetas que servem para separa "blocos de códigos"; para o autor, ajuda a separar o que é oque
+## a etiqueta blk_Nx terá no fim a marcação "Nx-BLKfin" para indicar o fim do bloco de código
+### 
+
+
+#E: def_N0
+function quest(){ # função para requerer download de ferramentas necessárias 
+	read -p "Want to download necessary functions(y/n): " functions
+	if [[ "$functions" = "y" ]]; then
+		if [[ $(id -u) -eq 0 ]]; then 
+			sleep 1
+		else
+			printf "root required\n" && sleep 4 && exit
+		fi
+		apt update && apt upgrade
+		apt install rename
+		apt install openssl
+	elif [[ "$functions" = "n" ]]; then
+		sleep 1
+	else 
+		echo 'not recognized'
+		quest
+	fi
+}
+#E: blk_N1
+#E: def_N0a
+function def_GenKey(){
+	keyent=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 7)
+		
+	echo 'This process is for one key generation'
+	#E: def_N7
+	function extraction(){
+		read -p "Choose key extraction (10/50/100/200/500/100000): " extraction_var
+		if [[ "$extraction_var" = "10" ]]; then
+			printf ""
+		elif [[ "$extraction_var" = "50" ]]; then
+			printf ""
+		elif [[ "$extraction_var" = "100" ]]; then
+			printf ""
+		elif [[ "$extraction_var" = "200" ]]; then
+			printf ""
+		elif [[ "$extraction_var" = "500" ]]; then
+			printf ""
+		elif [[ "$extraction_var" = "100000" ]]; then
+			printf ""
+		else
+			echo 'NOT RECOGNIZED'
+			read -p "Press ENTER"
+			extraction # função: def_N7
+		fi
+			
+		read -p "Choose hash (256/512): " hash
+			
+		if [[ "$extraction_var" = "10" ]]; then
+			entropy10=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 10)
+			if [[ "$hash" = "256" ]]; then
+				echo -n "$entropy10" | openssl dgst -sha256 -binary > $keyent.key
+				echo "Name key: $keyent.key"
+				read -p "Do you want to expand the key(y/n): " exP 								# alteração [+] 17/10/2023 {
+				if [[ "$exP" = "y" ]]; then
+					hexdump -C $keyent.key > $keyent-expand.key
+					read -p "Delete $keyent.key (y/n): " delkey1
+					if [[ "$delkey1" = "y" ]]; then
+						shred -n 1000 -z -u $keyent.key
+					elif [[ "$delkey1" = "n" ]]; then
+						echo -e "Name key: $keyent.key\nName key+: $keyent-expand.key"
+					else
+						echo "NOT RECOGNIZED"
+						read -p "Press ENTER"
+						extraction # função def_N7
+					fi
+				elif [[ "$exP" = "n" ]]; then
+					echo "Ok..."
+					exit
+				else
+					echo "NOT RECOGNIZED"
+					read -p "Press ENTER"
+					extraction # função: def_N7
+				fi 																				# alteração 17/10/2023 }
+				read -p "Press ENTER" && exit
+				
+			elif [[ "$hash" = "512" ]]; then
+				echo -n "$entropy10" | openssl dgst -sha512 -binary > $keyent.key
+				echo "Name key: $keyent.key"
+				read -p "Do you want to expand the key(y/n): " exP 								# alteração [+] 17/10/2023 {
+				if [[ "$exP" = "y" ]]; then
+					hexdump -C $keyent.key > $keyent-expand.key
+					read -p "Delete $keyent.key (y/n): " delkey1
+					if [[ "$delkey1" = "y" ]]; then
+						shred -n 1000 -z -u $keyent.key
+					elif [[ "$delkey1" = "n" ]]; then
+						echo -e "Name key: $keyent.key\nName key+: $keyent-expand.key"
+					else
+						echo "NOT RECOGNIZED"
+						read -p "Press ENTER"
+						extraction # função def_N7
+					fi
+				elif [[ "$exP" = "n" ]]; then
+					echo "Ok..."
+					exit
+				else
+					echo "NOT RECOGNIZED"
+					read -p "Press ENTER"
+					extraction # função: def_N7
+				fi 																				# alteração 17/10/2023 }
+				read -p "Press ENTER" && exit
+				
+			else
+				echo 'NOT RECOGNIZED'
+				read -p "Press ENTER"
+				extraction # função: def_N7					
+			fi
+				
+		elif [[ "$extraction_var" = "50" ]]; then
+			entropy50=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 50)
+			if [[ "$hash" = "256" ]]; then
+				echo -n "$entropy50" | openssl dgst -sha256 -binary > $keyent.key
+				echo "Name key: $keyent.key"
+				read -p "Do you want to expand the key(y/n): " exP 								# alteração [+] 17/10/2023 {
+				if [[ "$exP" = "y" ]]; then
+					hexdump -C $keyent.key > $keyent-expand.key
+					read -p "Delete $keyent.key (y/n): " delkey1
+					if [[ "$delkey1" = "y" ]]; then
+						shred -n 1000 -z -u $keyent.key
+					elif [[ "$delkey1" = "n" ]]; then
+						echo -e "Name key: $keyent.key\nName key+: $keyent-expand.key"
+					else
+						echo "NOT RECOGNIZED"
+						read -p "Press ENTER"
+						extraction # função def_N7
+					fi
+				elif [[ "$exP" = "n" ]]; then
+					echo "Ok..."
+					exit
+				else
+					echo "NOT RECOGNIZED"
+					read -p "Press ENTER"
+					extraction # função: def_N7
+				fi 																				# alteração 17/10/2023 }
+				read -p "Press ENTER" && exit
+				
+			elif [[ "$hash" = "512" ]]; then
+				echo -n "$entropy50" | openssl dgst -sha512 -binary > $keyent.key
+				echo "Name key: $keyent.key"
+				read -p "Do you want to expand the key(y/n): " exP 								# alteração [+] 17/10/2023 {
+				if [[ "$exP" = "y" ]]; then
+					hexdump -C $keyent.key > $keyent-expand.key
+					read -p "Delete $keyent.key (y/n): " delkey1
+					if [[ "$delkey1" = "y" ]]; then
+						shred -n 1000 -z -u $keyent.key
+					elif [[ "$delkey1" = "n" ]]; then
+						echo -e "Name key: $keyent.key\nName key+: $keyent-expand.key"
+					else
+						echo "NOT RECOGNIZED"
+						read -p "Press ENTER"
+						extraction # função def_N7
+					fi
+				elif [[ "$exP" = "n" ]]; then
+					echo "Ok..."
+					exit
+				else
+					echo "NOT RECOGNIZED"
+					read -p "Press ENTER"
+					extraction # função: def_N7
+				fi 																				# alteração 17/10/2023 }
+				read -p "Press ENTER" && exit
+				
+			else
+				echo 'NOT RECOGNIZED'
+				read -p "Press ENTER"
+				extraction # função: def_N7
+			fi
+				
+		elif [[ "$extraction_var" = "100" ]]; then
+			entropy100=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 100)
+			if [[ "$hash" = "256" ]]; then
+				echo -n "$entropy100" | openssl dgst -sha256 -binary > $keyent.key
+				echo "Name key: $keyent.key"
+				read -p "Do you want to expand the key(y/n): " exP 								# alteração [+] 17/10/2023 {
+				if [[ "$exP" = "y" ]]; then
+					hexdump -C $keyent.key > $keyent-expand.key
+					read -p "Delete $keyent.key (y/n): " delkey1
+					if [[ "$delkey1" = "y" ]]; then
+						shred -n 1000 -z -u $keyent.key
+					elif [[ "$delkey1" = "n" ]]; then
+						echo -e "Name key: $keyent.key\nName key+: $keyent-expand.key"
+					else
+						echo "NOT RECOGNIZED"
+						read -p "Press ENTER"
+						extraction # função def_N7
+					fi
+				elif [[ "$exP" = "n" ]]; then
+					echo "Ok..."
+					exit
+				else
+					echo "NOT RECOGNIZED"
+					read -p "Press ENTER"
+					extraction # função: def_N7
+				fi 																				# alteração 17/10/2023 }
+				read -p "Press ENTER" && exit
+				
+			elif [[ "$hash" = "512" ]]; then
+				echo -n "$entropy100" | openssl dgst -sha512 -binary > $keyent.key
+				echo "Name key: $keyent.key"
+				read -p "Do you want to expand the key(y/n): " exP 								# alteração [+] 17/10/2023 {
+				if [[ "$exP" = "y" ]]; then
+					hexdump -C $keyent.key > $keyent-expand.key
+					read -p "Delete $keyent.key (y/n): " delkey1
+					if [[ "$delkey1" = "y" ]]; then
+						shred -n 1000 -z -u $keyent.key
+					elif [[ "$delkey1" = "n" ]]; then
+						echo -e "Name key: $keyent.key\nName key+: $keyent-expand.key"
+					else
+						echo "NOT RECOGNIZED"
+						read -p "Press ENTER"
+						extraction # função def_N7
+					fi
+				elif [[ "$exP" = "n" ]]; then
+					echo "Ok..."
+					exit
+				else
+					echo "NOT RECOGNIZED"
+					read -p "Press ENTER"
+					extraction # função: def_N7
+				fi 																				# alteração 17/10/2023 }
+				read -p "Press ENTER" && exit
+				
+			else
+				echo 'NOT RECOGNIZED'
+				read -p "Press ENTER"
+				extraction # função: def_N7
+			fi
+				
+		elif [[ "$extraction_var" = "200" ]]; then
+			entropy200=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 200)
+			if [[ "$hash" = "256" ]]; then
+				echo -n "$entropy200" | openssl dgst -sha256 -binary > $keyent.key
+				echo "Name key: $keyent.key"
+				read -p "Do you want to expand the key(y/n): " exP 								# alteração [+] 17/10/2023 {
+				if [[ "$exP" = "y" ]]; then
+					hexdump -C $keyent.key > $keyent-expand.key
+					read -p "Delete $keyent.key (y/n): " delkey1
+					if [[ "$delkey1" = "y" ]]; then
+						shred -n 1000 -z -u $keyent.key
+					elif [[ "$delkey1" = "n" ]]; then
+						echo -e "Name key: $keyent.key\nName key+: $keyent-expand.key"
+					else
+						echo "NOT RECOGNIZED"
+						read -p "Press ENTER"
+						extraction # função def_N7
+					fi
+				elif [[ "$exP" = "n" ]]; then
+					echo "Ok..."
+					exit
+				else
+					echo "NOT RECOGNIZED"
+					read -p "Press ENTER"
+					extraction # função: def_N7
+				fi 																				# alteração 17/10/2023 }
+				read -p "Press ENTER" && exit
+				
+			elif [[ "$hash" = "512" ]]; then
+				echo -n "$entropy200" | openssl dgst -sha512 -binary > $keyent.key
+				echo "Name key: $keyent.key"
+				read -p "Do you want to expand the key(y/n): " exP 								# alteração [+] 17/10/2023 {
+				if [[ "$exP" = "y" ]]; then
+					hexdump -C $keyent.key > $keyent-expand.key
+					read -p "Delete $keyent.key (y/n): " delkey1
+					if [[ "$delkey1" = "y" ]]; then
+						shred -n 1000 -z -u $keyent.key
+					elif [[ "$delkey1" = "n" ]]; then
+						echo -e "Name key: $keyent.key\nName key+: $keyent-expand.key"
+					else
+						echo "NOT RECOGNIZED"
+						read -p "Press ENTER"
+						extraction # função def_N7
+					fi
+				elif [[ "$exP" = "n" ]]; then
+					echo "Ok..."
+					exit
+				else
+					echo "NOT RECOGNIZED"
+					read -p "Press ENTER"
+					extraction # função: def_N7
+				fi 																				# alteração 17/10/2023 }
+				read -p "Press ENTER" && exit
+				
+			else
+				echo 'NOT RECOGNIZED'
+				read -p "Press ENTER"
+				extraction # função: def_N7
+			fi
+			
+		elif [[ "$extraction_var" = "500" ]]; then
+			entropy500=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 500)
+			if [[ "$hash" == "256" ]]; then
+				echo -n "$entropy500" | openssl dgst -sha256 -binary > $keyent.key
+				echo "Name key: $keyent.key"
+				read -p "Do you want to expand the key(y/n): " exP 								# alteração [+] 17/10/2023 {
+				if [[ "$exP" = "y" ]]; then
+					hexdump -C $keyent.key > $keyent-expand.key
+					read -p "Delete $keyent.key (y/n): " delkey1
+					if [[ "$delkey1" = "y" ]]; then
+						shred -n 1000 -z -u $keyent.key
+					elif [[ "$delkey1" = "n" ]]; then
+						echo -e "Name key: $keyent.key\nName key+: $keyent-expand.key"
+					else
+						echo "NOT RECOGNIZED"
+						read -p "Press ENTER"
+						extraction # função def_N7
+					fi
+				elif [[ "$exP" = "n" ]]; then
+					echo "Ok..."
+					exit
+				else
+					echo "NOT RECOGNIZED"
+					read -p "Press ENTER"
+					extraction # função: def_N7
+				fi 																				# alteração 17/10/2023 }
+				read -p "Press ENTER" && exit
+				
+			elif [[ "$hash" = "512" ]]; then
+				echo -n "$entropy500" | openssl dgst -sha512 -binary > $keyent.key
+				echo "Name key: $keyent.key"
+				read -p "Do you want to expand the key(y/n): " exP 								# alteração [+] 17/10/2023 {
+				if [[ "$exP" = "y" ]]; then
+					hexdump -C $keyent.key > $keyent-expand.key
+					read -p "Delete $keyent.key (y/n): " delkey1
+					if [[ "$delkey1" = "y" ]]; then
+						shred -n 1000 -z -u $keyent.key
+					elif [[ "$delkey1" = "n" ]]; then
+						echo -e "Name key: $keyent.key\nName key+: $keyent-expand.key"
+					else
+						echo "NOT RECOGNIZED"
+						read -p "Press ENTER"
+						extraction # função def_N7
+					fi
+				elif [[ "$exP" = "n" ]]; then
+					echo "Ok..."
+					exit
+				else
+					echo "NOT RECOGNIZED"
+					read -p "Press ENTER"
+					extraction # função: def_N7
+				fi 																				# alteração 17/10/2023 }
+				read -p "Press ENTER" && exit
+				
+			else
+				echo 'NOT RECOGNIZED'
+				read -p "Press ENTER"
+				extraction # função: def_N7
+			fi
+		elif [[ "$extraction_var" = "100000" ]]; then
+			entropy100000=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 500)
+			if [[ "$hash" == "256" ]]; then
+				echo -n "$entropy100000" | openssl dgst -sha256 -binary > $keyent.key
+				echo "Name key: $keyent.key"
+				read -p "Do you want to expand the key(y/n): " exP 								# alteração [+] 17/10/2023 {
+				if [[ "$exP" = "y" ]]; then
+					hexdump -C $keyent.key > $keyent-expand.key
+					read -p "Delete $keyent.key (y/n): " delkey1
+					if [[ "$delkey1" = "y" ]]; then
+						shred -n 1000 -z -u $keyent.key
+					elif [[ "$delkey1" = "n" ]]; then
+						echo -e "Name key: $keyent.key\nName key+: $keyent-expand.key"
+					else
+						echo "NOT RECOGNIZED"
+						read -p "Press ENTER"
+						extraction # função def_N7
+					fi
+				elif [[ "$exP" = "n" ]]; then
+					echo "Ok..."
+					exit
+				else
+					echo "NOT RECOGNIZED"
+					read -p "Press ENTER"
+					extraction # função: def_N7
+				fi 																				# alteração 17/10/2023 }
+				read -p "Press ENTER" && exit
+				
+			elif [[ "$hash" = "512" ]]; then
+				echo -n "$entropy100000" | openssl dgst -sha512 -binary > $keyent.key
+				echo "Name key: $keyent.key"
+#				read -p "Press ENTER" 															{desativado 17/10/2023}
+#				exit                                                                        	{desativado 17/3/2023}
+				read -p "Do you want to expand the key(y/n): " exP 								# alteração [+] 17/10/2023 {
+				if [[ "$exP" = "y" ]]; then
+					hexdump -C $keyent.key > $keyent-expand.key
+					read -p "Delete $keyent.key (y/n): " delkey1
+					if [[ "$delkey1" = "y" ]]; then
+						shred -n 1000 -z -u $keyent.key
+					elif [[ "$delkey1" = "n" ]]; then
+						echo -e "Name key: $keyent.key\nName key+: $keyent-expand.key"
+					else
+						echo "NOT RECOGNIZED"
+						read -p "Press ENTER"
+						extraction # função def_N7
+					fi
+				elif [[ "$exP" = "n" ]]; then
+					echo "Ok..."
+					exit
+				else
+					echo "NOT RECOGNIZED"
+					read -p "Press ENTER"
+					extraction # função: def_N7
+				fi 																				# alteração 17/10/2023 }
+				read -p "Press ENTER" && exit
+			else
+				echo 'NOT RECOGNIZED'
+				read -p "Press ENTER"
+				extraction # função: def_N7
+			fi
+		fi
+	}
+	extraction # função: def_N7
+}
+
+#E: def_N0b
+function def_encryption(){
+		
+	read -p "Do you have access key(y/n): " havekey
+	if [[ "$havekey" = "y" ]]; then
+		echo ''
+	elif [[ "$havekey" = "n" ]]; then
+		echo 'A keys in required'
+		read -p "Generate (y/n): " resp
+		if [[ "$resp" = "y" ]]; then
+			def_GenKey # função: def_N0a
+		elif [[ "$resp" = "n" ]]; then
+			exit
+		else
+			echo 'NOT RECOGNIZED'
+			read -p "Enter for exit"
+			exit
+		fi
+	fi
+	read -p "Insert file for encryption: " fileENC
+	read -p "Enter the number of iterations: " iter
+	printf "\nIt is important to keep the access key well; If you lose this key,you will not be able"
+	printf "to recover the encrypted file.\n"
+	read -p "Inser key for access: " access
+	openssl enc -aes-256-cbc -a -pbkdf2 -iter $iter -in $fileENC -out $fileENC.enc -pass file:$access
+}
+
+#E: def_N0c
+function TIME() {
+
+	echo "/" && clear
+	echo "\\" && clear
+	echo "/" && clear
+
+}
+
+
+case $1 in
+	
+	--image)
+#		quest 																					{desativado 17/10/2023}		
+		read -p "Enter file name: " imgfile #entrada do nome da imagem
+		read -p "New image name: " name
+		
+		#E: def_N1
+		function imageX(){
+			read -p "Do you want to separate by line (l) or megabits (m): " op #opção de dividir por linhas ou megabits 
+			
+			if [[ "$op" = "l" ]]; then
+				xxd -p $imgfile $name.txt
+				printf "The number of lines entered will be the maximum volume of lines per file.\n"
+				printf "Example: if the file has 2000 lines and 500 are entered, 4 files of 500 lines will be generated.\n"
+				read -p "Enter the number of lines: " lines
+				split -l $lines $name.txt
+				read -p "Delete entire .txt(y/n): " opdel
+				if [[ "$opdel" = "y" ]]; then
+					shred -n 500 -z -u $name.txt
+				else
+					echo "Entire .txt kept"
+				fi
+				#E: def_N2
+				function nameblock(){ # função para dar nomes aos arquivos bloco
+					echo "1) part. / 2) file. / 3) block."
+					read -p "Choose the name of the broken blocks: " blkname
+					if [[ "$blkname" = "1" ]]; then
+						rename 's/(x)/part./' x*
+					elif [[ "$blkname" = "2" ]]; then
+						rename 's/(x)/file./' x*
+					elif [[ "$blkname" = "3" ]]; then
+						rename 's/(x)/block./' x*
+					else
+						echo 'NOT RECOGNIZED'
+						echo 'option: 1, 2 or 3...'
+						read -p "Press ENTER"
+						nameblock # função: def_N2
+					fi
+				}
+				nameblock # função: def_N2
+				
+			elif [[ "$op" = "m" ]]; then
+				xxd -p $imgfile $name.txt
+				printf "The number of megabits entered will be maximum volume of megabits per file.\n"
+				read -p "Enter the numbers of megabits: " mega
+				split -b $mega $name.txt
+				read -p "Delete entire .txt(y/n): " opdel
+				if [[ "$opdel" = "y" ]]; then
+					shred -n 500 -z -u $name.txt
+				else
+					echo "Entire .txt kept"
+				fi
+				#E: def_N3
+				function nameblock(){ #função para dar nomes aos arquivos blocos
+					echo '1) part. / 2) file. / 3) block.'
+					read -p "Choose the name of the broken blocks: " blkname
+					if [[ "$blkname" = "1" ]]; then
+						rename 's/(x)/part./' x*
+					elif [[ "#blkname" = "2" ]]; then
+						ranema 's/(x)/file./' x*
+					elif [[ "$blkname" = "3" ]]; then
+						rename 's/(x)/block./' x*
+					else
+						echo 'NOT RECOGNIZED'
+						echo 'option: 1, 2 or 3...'
+						read -p "Press ENTER"
+						nameblock # função: def_N3
+					fi
+				}
+				nameblock # função: def_N3
+				
+			else
+				echo 'not recognized' && sleep 3
+				imageX # função: def_N1
+			fi
+		}
+		imageX # função: def_N1
+	;;
+	
+	--img-restore)
+#		quest 																					{desativado 17/10/2023}		
+		echo "HEX file input..."
+		read -p "Enter file name: " imgFile
+		read -p "File format (.png/.jpg): " format
+		read -p "New file name: " name
+		xxd -r -p $imgFile  $name$format
+	;;
+	
+	--txt)
+#		quest 																					{desativado 17/10/2023}		
+		read -p "Enter file name: " txtfile
+		read -p "Enter text name: " name
+		#E: def_N4
+		function text(){
+			read -p "Do you want to separated by line (l) or megabits (m): " op
+			if [[ "$op" = "l" ]]; then
+				xxd -p $txtfile $name.txt
+				printf "The number of lines entered will be the maximum volume of lines per file.\n"
+				printf "Example: if the file has 2000 lines and 500 are entered, 4 files of 500 lines will be generated.\n"
+				read -p "Enter the number of lines: " lines
+				split -l $lines $name.txt
+				read -p "Delete entire .txt(y/n): " opdel
+				if [[ "$opdel" = "y" ]]; then
+					shred -n 500 -z -u $name.txt
+				else
+					echo "Entere .txt kept"
+				fi
+				
+				#E: def_N5
+				function nameblock(){
+					echo '1) block. / 2) newtext. / 3) newfile.'
+					read -p "Choose the name of the broken blocks: " blkname
+					if [[ "$blkname" = "1" ]]; then
+						rename 's/(x)/block./' x*
+					elif [[ "$blkname" = "2" ]]; then
+						rename 's/(x)/newtext./' x*
+					elif [[ "$blkname" = "3" ]]; then
+						rename 	's/(x)/newfile./' x*
+					else
+						echo 'NOT RECOGNIZED'
+						echo 'Option: 1, 2 or 3...'
+						read -p "Press ENTER"
+						nameblock # função: def_N5
+					fi
+				}
+				nameblock # função: def_N5
+			
+			elif [[ "$op" = "m" ]]; then
+				xxd -p $txtfile $name.txt
+				printf "The number of megabits entered will be maximum volume of megabits per file.\n"
+				read -p "Enter the numbers of megabits: " mega
+				split -b $mega $name.txt
+				read -p "Delete entire .txt(y/n): " opdel
+				if [[ "$opdel" = "y" ]]; then
+					shred -n 500 -z -u $name.txt
+				else
+					echo 'Entere .txt kept'
+				fi
+				#E: def_N6
+				function nameblock(){
+					echo '1) block. / 2) newtext. / 3) newfile.'
+					read -p "Choose the name of the broken block: " blkname
+					if [[ "$blkname" = "1" ]]; then
+						rename 's/(x)/block./' x*
+					elif [[ "$blkname" = "2" ]]; then
+						reanme 's/(x)/newtext./' x*
+					elif [[ "$blkname" = "3" ]]; then
+						rename 's/(x)/newfile./' x*
+					else
+						echo 'NOT RECOGNIZED'
+						echo 'Option 1, 2 or 3...'
+						read -p "Press ENTER"
+						nameblock # função: def_N6
+					fi	
+				}
+				nameblock # função: def_N6
+							
+			else 
+				echo 'NOT RECOGNIZED'
+				read -p "Press ENTER"
+				text # função: def_N4
+			fi
+		}
+		text # função: def_N4
+		
+	
+	
+	;;
+	
+	--txt-restore)
+#		quest 																					{desativado 17/10/2023}		
+		echo 'HEX file input...'
+		read -p "Enter file name: " txtfile
+		read -p "File format (.txt/.odf/.odt/.ods): " format
+		read -p "New file name: " newname
+		xxd -r -p $txtfile $newname$format
+	
+	;;
+	
+	--vi)
+#		quest 																					{desativado 17/10/2023}		
+		read -p "Enter file name: " vfile
+		read -p "Enter new name: " newVfile
+		
+		#E: def_N7
+		function video(){
+			read -p "Do you want separated by line (l) or megabits (m): " op
+			if [[ "$op" = "l" ]]; then
+				xxd -p $vfile $newVfile.txt
+				printf "The number of lines entered will be the maximum volume of lines per file.\n"
+				printf "Example: if the file has 2000 lines and 500 are entered, 4 files of 500 lines will be generated.\n"
+				read -p "Enter the number of lines: " lines
+				split -l $lines $newVfile.txt
+				read -p "Delete entire .txt(y/n): " delop
+				if [[ "$delop" = y ]]; then
+					shred -n 500 -z -u $newVfile.txt
+				else
+					echo "Entire .txt kept"
+				fi
+				function nameblock(){
+				
+					echo '1) block-vid. / 2) new-vid. / 3) newfile-vid.'
+					read -p "Choose the name of the broken blocks: " blkname
+					if [[ "$blkname" = "1" ]]; then
+						rename 's/(x)/$block-vid./' x*
+					elif [[ "$blkname" = "2" ]]; then
+						rename 's/(x)/new-vid./' x*
+					elif [[ "$blkname" = "3" ]]; then
+						rename 's/(x)/newfile-vid./' x*
+					else
+						echo "NOT RECOGNZED"
+						echo 'OptioN 1, 2 or 3...'
+						read -p "Press ENTER"
+						nameblock # função: def_N8
+					fi
+				}
+				nameblock # função: def_N8
+			elif [[ "$op" = "m" ]]; then
+				xxd -p $vfile $newVfile.txt
+				printf "The number of megabits entered will be maximum volume of megabits per file\n"
+				read -p "Enter the number of megabits: " mega
+				split -b $mega $newVfile.txt
+				read -p "Delete entire .txt(y/n): " delop
+				if [[ "$delop" = "y" ]]; then
+					shred -n 500 -z -u $newVfile.txt
+				else
+					echo "Entire .txt kept"
+				 
+				fi
+			#E: def_N8
+				function nameblock(){
+				
+					echo '1) block-vid. / 2) new-vid. / 3) newfile-vid.'
+					read -p "Choose the name of the broken blocks: " blkname
+					if [[ "$blkname" = "1" ]]; then
+						rename 's/(x)/$block-vid./' x*
+					elif [[ "$blkname" = "2" ]]; then
+						rename 's/(x)/new-vid./' x*
+					elif [[ "$blkname" = "3" ]]; then
+						rename 's/(x)/newfile-vid./' x*
+					else
+						echo "NOT RECOGNZED"
+						echo 'OptioN 1, 2 or 3...'
+						read -p "Press ENTER"
+						nameblock # função: def_N8
+					fi
+				}
+				nameblock # função: def_N8
+			else
+				echo 'NOT RECOGNIZED'
+				read -p "Press ENTER"
+				video # fnção: def_N7	
+			fi	
+		}
+		
+		video # função: def_N7
+	;;
+	
+	--vi-restore)
+#		quest 																					{desativado 17/10/2023}		
+		echo 'HEX file input...'
+		read -p "Enter file name: " txtfile
+		read -p "New file name: " name
+		xxd -r -p $txtfile $name.mkv
+	;;
+	
+	-gk|--gen-key)
+#		quest 																					{desativado 17/10/2023}		
+		def_GenKey # função: def_N0a
+		
+	
+	;;
+	
+	-enc|--encryption)
+#		quest 																					{desativado 17/10/2023}
+		def_encryption # função: def_N0b
+	
+	;;
+	
+	-dec|--decryption)
+#		quest 																					{desativado 17/10/2023}
+		echo 'This is final process...'
+		read -p "Insert file for decryption: " dfileENC
+		read -p "Enter new name for the file: " newname
+		read -p "Enter for number of iterations: " iter
+		read -p "Insert key for access: " access
+		openssl enc -aes-256-cbc -d -a -pbkdf2 -iter $iter -in $dfileENC -out $newname -pass file:$access
+		
+	
+	;;
+	
+	--update)
+		
+		echo "Internet required..."
+#		sleep 5s tee TIME
+		quest #função: def_N0
+	;;	
+	
+	-h|--help)
+		echo '------------------------------------------------------'
+		echo 'For update, "--update" option'
+		echo '	# This process in important to check if the usar has all the necessary tools'
+		echo '------------------------------------------------------'
+		echo 'For image wrapping, "--image" option'
+		echo 'For text wrapping, "--txt" option'
+		echo 'For video wrapping, "--vi" option'
+		echo '------------------------------------------------------'
+		echo 'For image restoration, "--img-restore" option'
+		echo 'For text restoration, "--txt-restore" option'
+		echo 'For video restoration, "--vi-restore" option'
+		echo '------------------------------------------------------'
+		echo 'For key generation, "-gk" or "--gen-key" option'
+		echo 'For file encryption, "-enc" or "--encryption" option'
+		echo 'For file decryption, "-dec" or "--decryption" option'
+		echo '------------------------------------------------------'
+		
+	
+	;;
+	
+	*)
+		ping -q -c 1 www.google.com > /dev/null 2>&1
+		testnet=$(echo "$?")
+		[[ "$testnet" -ne 0 ]] && flag=1
+		[[ "$testnet" -eq 0 ]] && flag=0
+		if [[ "$flag" -eq 0 ]]; then
+			echo "There is an internet connection, this can be a breach for security."
+			read -p "Go on (y/n): " op
+			if [[ "$op" = "n" ]]; then
+				exit
+			fi
+			elif [[ "$flag" -ne 0 ]]; then
+				printf 'press\n'
+		fi
+		echo 'Paramters: -h or --help'
+	
+	;;
+
+
+esac
+#N1-BLKfin
