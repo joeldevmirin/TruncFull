@@ -2,7 +2,7 @@
 Executavel: TruncFull.sh
 
 Converter em um executável:
-	chmod +x TruncFull.exec
+	chmod +x TruncFull.sh
 
 
 Menu:
